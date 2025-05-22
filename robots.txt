@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /about.html
+Allow: /contact.html
+
+# Disallow any temporary files
+Disallow: /temp/
+Disallow: /*.tmp$
+
+# Sitemap declaration
+Sitemap: https://paatheya-academy.com/sitemap.xml 
