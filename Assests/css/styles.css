@@ -23,7 +23,7 @@ body {
     height: 2px;
     bottom: -2px;
     left: 0;
-    background-color: #7338A0;
+    background-color: #27ae60;
     transition: width 0.4s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
@@ -33,7 +33,7 @@ body {
 }
 
 .nav-link.active {
-    color: #7338A0 !important;
+    color: #27ae60 !important;
     font-weight: 500;
 }
 
