@@ -10,8 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initializes the contact form validation and submission handling
  */
 function initContactForm() {
-    const contactForm = document.querySelector('form[action="#"]');
-    
+    const contactForm = document.getElementById('contactForm');
     if (!contactForm) return;
     
     // Add contact-form class for styling
@@ -62,7 +61,6 @@ function initContactForm() {
     if (emailInput) {
         emailInput.addEventListener('input', () => {
             const errorElement = createErrorElement(emailInput, 'Please enter a valid email address');
-            
             if (emailInput.value && !validateEmail(emailInput.value)) {
                 errorElement.classList.add('show');
             } else {
@@ -85,9 +83,11 @@ function initContactForm() {
     }
     
     // Form submission
-    contactForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        let isValid = true;
+    const ENABLE_LEGACY_SUBMIT = window.ENABLE_LEGACY_SUBMIT === true;
+    if (ENABLE_LEGACY_SUBMIT) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let isValid = true;
         
         // Validate first name
         if (!firstNameInput.value) {
@@ -103,8 +103,8 @@ function initContactForm() {
             isValid = false;
         }
         
-        // Validate email
-        if (!emailInput.value || !validateEmail(emailInput.value)) {
+        // Validate email only if field exists
+        if (emailInput && emailInput.value && !validateEmail(emailInput.value)) {
             const errorElement = createErrorElement(emailInput, 'Valid email is required');
             errorElement.classList.add('show');
             isValid = false;
@@ -154,34 +154,32 @@ function initContactForm() {
                 });
             }, 1500);
         }
-    });
-} 
-
-// WhatsApp form submission handler
-const whatsappNumber = '916354004179'; // Set your WhatsApp number here (country code + number, no + sign)
-
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('contactForm');
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const firstName = document.getElementById('first_name').value.trim();
-            const lastName = document.getElementById('last_name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const message = document.getElementById('message').value.trim();
-
-            // Format the WhatsApp message
-            const waMessage =
-                `New Contact Form web:%0A` +
-                `Name: ${firstName} ${lastName}%0A` +
-                `Email: ${email}%0A` +
-                `Phone: ${phone}%0A` +
-                `Message: ${encodeURIComponent(message)}`;
-
-            // Open WhatsApp with the message
-            const waUrl = `https://wa.me/${whatsappNumber}?text=${waMessage}`;
-            window.open(waUrl, '_blank');
         });
     }
-}); 
+} 
+
+// WhatsApp form submission handler (disabled by default; enable by setting window.ENABLE_WHATSAPP = true)
+const whatsappNumber = '916354004179';
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.ENABLE_WHATSAPP === true) {
+        const form = document.getElementById('contactForm');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const firstName = (document.getElementById('first_name')?.value || '').trim();
+                const lastName = (document.getElementById('last_name')?.value || '').trim();
+                const email = (document.getElementById('email')?.value || '').trim();
+                const phone = (document.getElementById('phone')?.value || '').trim();
+                const message = (document.getElementById('message')?.value || '').trim();
+                const waMessage =
+                    `New Contact Form web:%0A` +
+                    `Name: ${firstName} ${lastName}%0A` +
+                    `Email: ${email}%0A` +
+                    `Phone: ${phone}%0A` +
+                    `Message: ${encodeURIComponent(message)}`;
+                const waUrl = `https://wa.me/${whatsappNumber}?text=${waMessage}`;
+                window.open(waUrl, '_blank');
+            });
+        }
+    }
+});

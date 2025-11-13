@@ -246,32 +246,12 @@
                                 </div>
                             </div>
 
-                            <!-- EMAIL FIELD COMMENTED OUT -->
-                            <!--
-                            <div class="relative">
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email
-                                    Address</label>
-                                <input type="email" id="email" name="email"
-                                    class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#7338A0] focus:border-[#7338A0]"
-                                    required>
-                                <div class="valid-icon absolute right-3 top-[35px] text-green-500 hidden"
-                                    id="email_icon">
-                                    <div
-                                        class="flex items-center justify-center w-5 h-5 text-white text-xs rounded-full;">
-                                        <img src="/Assests/tick.webp" alt="✅">
-                                    </div>
-                                </div>
-                                <p class="text-sm text-red-500 mt-1 hidden" id="email_error">Use a valid email like
-                                    Gmail, Yahoo, etc.</p>
-                            </div>
-                            -->
-
                             <div class="relative">
                                 <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone
                                     Number (with country code)</label>
                                 <input type="tel" id="phone" name="phone"
                                     class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#7338A0] focus:border-[#7338A0]"
-                                    pattern="^\\+?[0-9]{7,15}$" placeholder="+91 9876543210"
+                                    pattern="^\+?[0-9]{7,15}$" placeholder="+919876543210"
                                     title="Enter a valid phone number with country code" required>
                                 <div class="valid-icon absolute right-3 top-[35px] text-green-500 hidden"
                                     id="phone_icon">
@@ -415,7 +395,7 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-white">
         <div class="max-w-screen-xl mx-auto px-4 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                     <h3 class="text-xl font-semibold mb-4">Paatheya Academy</h3>
                     <p class="text-gray-400">Your Path. Your Voice. Your Paatheya.</p>
@@ -428,14 +408,7 @@
                         <li><a href="/contact.html" class="text-gray-400 hover:text-white">Contact</a></li>
                     </ul>
                 </div>
-                <div>
-                    <h3 class="text-xl font-semibold mb-4">Courses</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white">Basic English</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">Business English</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white">IELTS Preparation</a></li>
-                    </ul>
-                </div>
+                
                 <div>
                     <h3 class="text-xl font-semibold mb-4">Contact Us</h3>
                     <p class="text-white">105, 1st Floor, Sunrise Mall,<br>
@@ -467,7 +440,6 @@
 
     <!-- Custom JS -->
     <script src="./Assests/js/main.js"></script>
-    <script src="./Assests/js/contact-form.js"></script>
     <script src="./index.js"></script>
     <script>
         // Initialize AOS animations
@@ -571,54 +543,93 @@
             });
         });
     </script>
-    <!-- Contact form script  -->
+    <!-- Contact form field validation highlights (keeps green ticks on input) -->
     <script>
-        const allowedDomains = [
-            'outlook.com',
-            'mail.com',
-            'gmx.com',
-            'neo.com',
-            '10minutemail.com', // for Minute Mail
-            'titan.email',
-            'yahoo.com',
-            'protonmail.com',
-            'icloud.com', // for Apple Mail
-            'mailfence.com',
-            'yandex.com',
-            'posteo.de',
-            'zoho.com',
-            'tuta.com',
-            'mozilla.org', // for Mozilla Thunderbird
-            'fastmail.com',
-            'runbox.com'
-        ];
-
-        const fields = ['first_name', 'last_name', /*'email',*/ 'phone', 'message'];
+        const fields = ['first_name', 'last_name', 'phone', 'message'];
 
         fields.forEach(field => {
             const input = document.getElementById(field);
             const icon = document.getElementById(`${field}_icon`);
-            const error = document.getElementById(`${field}_error`);
+            if (!input || !icon) return;
 
             input.addEventListener('input', () => {
                 let isValid = input.checkValidity() && input.value.trim().length > 0;
-
-                // Email validation removed
-                // Phone validation for international numbers
                 if (field === 'phone') {
-                    // Accepts + and 7-15 digits
                     const phonePattern = /^\+?[0-9]{7,15}$/;
                     isValid = phonePattern.test(input.value.trim());
                 }
-
-                if (isValid) {
-                    icon.classList.remove('hidden');
-                } else {
-                    icon.classList.add('hidden');
-                }
+                icon.classList.toggle('hidden', !isValid);
             });
         });
     </script>
+
+
+    <!-- Google Sheets submit handler: paste your Web App URL and Secret below -->
+    <script>
+        // 1) Paste your deployed Web App URL (must end with /exec)
+        const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyj8v5rDxIXtfFJuhCosMtOVjX_hQQNLt40iohnjnva9S9XcWwpnJiTecBtbTL7ztZ4tg/exec";
+        // 2) Paste the same secret you used in Apps Script
+        const SECRET_TOKEN = "aaaaabbbbbcccccaaaaabbbbbccccc";
+
+        const formEl = document.getElementById('contactForm');
+        if (formEl) {
+            const submitBtn = formEl.querySelector('button[type="submit"]');
+            const statusBar = document.createElement('div');
+            statusBar.className = 'mt-4 text-sm hidden';
+            formEl.appendChild(statusBar);
+
+            function setLoading(loading) {
+                if (!submitBtn) return;
+                if (loading) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send Message';
+                }
+            }
+
+            function showStatus(ok, msg) {
+                statusBar.classList.remove('hidden');
+                statusBar.textContent = msg;
+                statusBar.className = `mt-4 text-sm ${ok ? 'text-green-600' : 'text-red-600'}`;
+            }
+
+            formEl.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const first = document.getElementById('first_name').value.trim();
+                const last = document.getElementById('last_name').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const message = document.getElementById('message').value.trim();
+
+                if (!first || !last || !phone || !message) {
+                    showStatus(false, 'Please fill all required fields.');
+                    return;
+                }
+
+                const fd = new FormData();
+                fd.append('token', SECRET_TOKEN);  // Apps Script checks params.token
+                fd.append('first', first);
+                fd.append('last', last);
+                fd.append('phone', phone);
+                fd.append('message', message);
+
+                setLoading(true);
+                try {
+                    // Use no-cors for guaranteed delivery (Apps Script often lacks CORS headers)
+                    await fetch(WEBAPP_URL, { method: 'POST', mode: 'no-cors', body: fd });
+                    formEl.reset();
+                    showStatus(true, 'Thank you! Your message has been sent.');
+                } catch (err) {
+                    showStatus(false, 'Could not send. Check your Web App URL and try again.');
+                } finally {
+                    setLoading(false);
+                }
+            });
+        }
+    </script>
+
 
 </body>
 
